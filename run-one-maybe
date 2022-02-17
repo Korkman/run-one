@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+# run-one-maybe - run-one but exit success (0) instead of EX_TEMPFAIL (75)
+#
+# NOTE: this effectively masks exit code 75 of your application!
+#
+#
+
+# Exit codes - see sysexits.h
+EX_USAGE=64
+EX_TEMPFAIL=75
+
+###############################################################################
+set -ue
+
+errexit() {
+	rc=$1
+	shift
+	echo "$@" 1>&2
+	exit "$rc"
+}
+
+[ $# -eq 0 ] && errexit $EX_USAGE "Usage: $0 [command ..]"
+
+NAME="$(basename "$0")"
+case "$NAME" in
+	run-one-maybe)
+		PROG="run-one"
+	;;
+	run-one-constantly-maybe)
+		PROG="run-one-constantly"
+	;;
+	run-one-until-success-maybe)
+		PROG="run-one-until-success"
+	;;
+	run-one-until-failure-maybe)
+		PROG="run-one-until-failure"
+	;;
+	*)
+		errexit $EX_USAGE "Unknown command: $NAME"
+	;;
+esac
+
+$PROG "$@"
+EXIT_CODE=$?
+[ "$EXIT_CODE" == "$EX_TEMPFAIL" ] && exit 0
+
+exit $EXIT_CODE
