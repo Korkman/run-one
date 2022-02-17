@@ -41,8 +41,9 @@ case "$NAME" in
 	;;
 esac
 
+set +e
 $PROG "$@"
 EXIT_CODE=$?
-[ "$EXIT_CODE" == "$EX_TEMPFAIL" ] && exit 0
+[ $EXIT_CODE -eq $EX_TEMPFAIL ] && exit 0
 
 exit $EXIT_CODE
